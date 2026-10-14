@@ -31,13 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="it" className="bg-black text-textPrimary">
+    <html lang="it" className="bg-black text-textPrimary" suppressHydrationWarning>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="bg-black min-h-screen overflow-x-hidden antialiased">
+      <body className="bg-black min-h-screen overflow-x-hidden antialiased" suppressHydrationWarning>
         {children}
       </body>
     </html>

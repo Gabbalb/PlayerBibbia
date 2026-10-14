@@ -9,8 +9,14 @@ const SAVE_INTERVAL_MS = 2000;
 function getAudioUrl(folder: string, file: string): string {
   const envBase = process.env.NEXT_PUBLIC_AUDIO_BASE_URL?.trim();
   const defaultBase = '/Bibbia/Bibbia%20mp3%20Interconfessionale%20-%20Copia';
-  const base = envBase || defaultBase;
-  const cleanBase = base.replace(/\/+$/, '');
+  let base = envBase || defaultBase;
+  let cleanBase = base.replace(/\/+$/, '');
+
+  // If a repository URL is provided without the nested audio folder, append it automatically
+  if (envBase && !cleanBase.includes('Bibbia') && !cleanBase.includes('Interconfessionale')) {
+    cleanBase = `${cleanBase}/Bibbia/Bibbia%20mp3%20Interconfessionale%20-%20Copia`;
+  }
+
   return `${cleanBase}/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
 }
 
