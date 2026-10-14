@@ -8,14 +8,16 @@ const SAVE_INTERVAL_MS = 2000;
 
 function getAudioUrl(folder: string, file: string): string {
   const envBase = process.env.NEXT_PUBLIC_AUDIO_BASE_URL?.trim();
-  const defaultBase = '/Bibbia/Bibbia%20mp3%20Interconfessionale%20-%20Copia';
-  let base = envBase || defaultBase;
+  let base = envBase || 'https://gabbalb.github.io/PlayerBibbia/Bibbia/Bibbia%20mp3%20Interconfessionale%20-%20Copia';
   let cleanBase = base.replace(/\/+$/, '');
 
-  // If a repository URL is provided without the nested audio folder, append it automatically
-  if (envBase && !cleanBase.includes('Bibbia') && !cleanBase.includes('Interconfessionale')) {
+  // If the user provided just the repository URL https://gabbalb.github.io/PlayerBibbia
+  if (cleanBase.endsWith('/PlayerBibbia')) {
     cleanBase = `${cleanBase}/Bibbia/Bibbia%20mp3%20Interconfessionale%20-%20Copia`;
   }
+
+  // Ensure any raw spaces in the base URL are properly encoded
+  cleanBase = cleanBase.replace(/ /g, '%20');
 
   return `${cleanBase}/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
 }
@@ -584,7 +586,16 @@ export function useAudioPlayer() {
     if (!audio) return;
 
     if (audio.paused) {
-      audio.play().catch(() => {
+      if (!audio.src || audio.src === window.location.href) {
+        const { books, currentBookIndex, currentChapterIndex } = stateRef.current;
+        const b = books[currentBookIndex];
+        const c = b?.chapters[currentChapterIndex];
+        if (b && c) {
+          audio.src = getAudioUrl(b.folder, c.file);
+        }
+      }
+      audio.play().catch((err) => {
+        console.error('Playback error:', err);
         setIsPlaying(false);
       });
     } else {
